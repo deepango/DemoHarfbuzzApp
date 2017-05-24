@@ -2,7 +2,9 @@
 
 #include <application.h>
 #include <menu.h>
+#include <menuItem.h>
 #include <view.h>
+
 #include "MainView.h"
 
 	
