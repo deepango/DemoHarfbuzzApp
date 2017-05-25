@@ -1,9 +1,9 @@
 #include "MainWindow.h"
 
-#include <application.h>
-#include <menu.h>
-#include <menuItem.h>
-#include <view.h>
+#include <Application.h>
+#include <Menu.h>
+#include <MenuItem.h>
+#include <View.h>
 
 #include "MainView.h"
 

@@ -13,6 +13,6 @@ MainView::Draw(BRect update)
 	font.SetSize(18.0);
 	
 	SetFont(&font);
-}
-DrawString("This is some text", BPoint(50,50));
+	
+	DrawString("This is some text", BPoint(50,50));
 }
