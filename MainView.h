@@ -6,7 +6,7 @@
 class MainView : public BView
 {
 public:
-					MainView(const BRect &frame)
+					MainView(const BRect &frame);
 		void		Draw(BRect update);
 };
 
