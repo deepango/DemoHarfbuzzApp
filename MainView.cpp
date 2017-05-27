@@ -5,7 +5,7 @@ MainView::MainView(const BRect &frame)
 {
 	// the font rasterizing library
     FreeTypeLib lib;
-    clock_t begin, end;
+    //clock_t begin, end;
 
     HBShaper latinShaper("DejaVuSerif.ttf", &lib);
     HBShaper arabicShaper("amiri-regular.ttf", &lib);
