@@ -3,10 +3,11 @@
 #include "hb.h"
 #include "hb-ft.h"
 #include "freetypelib.h"
-#include "glutils.h"
 #include <cmath>
 #include <vector>
 #include <limits>
+
+#include <Bitmap.h>
 
 using namespace std;
 
@@ -37,7 +38,7 @@ class HBShaper {
         ~HBShaper();
 
         void init();
-        void HBShaper::drawText(HBText& text, const BBitmap* bitmap, float x, float y);
+        drawText(HBText& text, const BBitmap* bitmap, float x, float y);
         void addFeature(hb_feature_t feature);
 
     private:
@@ -110,7 +111,7 @@ HBShaper::drawText(HBText& text, const BBitmap* bitmap, float x, float y)
         // for x and y:
         // This probaly needs to be changed to use x0 and y0 instead
         // of x and y.
-        uint8* pixel = bits + (int32)y * bytesPerRow + (int32)x * 4;
+        uint8* pixel = bits + (int32)y0 * bytesPerRow + (int32)x0 * 4;
 
         // Copy the rasterized glyph into the bitmap buffer
         for (int iy = 0; iy < glyph->height; ++iy) {
