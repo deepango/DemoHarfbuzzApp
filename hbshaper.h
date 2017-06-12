@@ -38,7 +38,7 @@ class HBShaper {
         ~HBShaper();
 
         void init();
-        drawText(HBText& text, const BBitmap* bitmap, float x, float y);
+        void drawText(HBText& text, const BBitmap* bitmap, float x, float y);
         void addFeature(hb_feature_t feature);
 
     private:
@@ -59,87 +59,85 @@ HBShaper::HBShaper(const string& fontFile, FreeTypeLib* fontLib) {
 void HBShaper::addFeature(hb_feature_t feature) {
     features.push_back(feature);
 }
-
+	
 void
 HBShaper::drawText(HBText& text, const BBitmap* bitmap, float x, float y)
 {
-    // Get a pointer to the BBitmaps memory buffer
-    uint8* bits = (uint8*)bitmap->Bits();
-    // There are this many bytes in one row
-    uint32 bytesPerRow = bitmap->BytesPerRow();
+	uint8* bits = (uint8*)bitmap->Bits();
+	uint32 bytesPerRow = bitmap->BytesPerRow();
 
-    // You don't need the GL meshes anymore, you can copy the rasterized
-    // glyph directly into the BBitmap's memory. You may have to do a
-    // color space conversion, i.e. the glyph's data may be gray scale,
-    // but the BBitmap's buffer is BGRA with 8 bits per chanel.
+	// You don't need the GL meshes anymore, you can copy the rasterized
+	// glyph directly into the BBitmap's memory. You may have to do a
+	// color space conversion, i.e. the glyph's data may be gray scale,
+	// but the BBitmap's buffer is BGRA with 8 bits per chanel.
 
-    // Here is the original code from the test app
-    hb_buffer_reset(buffer);
+	// Here is the original code from the test app
+	hb_buffer_reset(buffer);
 
-    hb_buffer_set_direction(buffer, text.direction);
-    hb_buffer_set_script(buffer, text.script);
-    hb_buffer_set_language(buffer,
-        hb_language_from_string(text.language.c_str(),
-        text.language.size()));
-    size_t length = text.data.size();
+	hb_buffer_set_direction(buffer, text.direction);
+	hb_buffer_set_script(buffer, text.script);
+	hb_buffer_set_language(buffer,
+		hb_language_from_string(text.language.c_str(),
+		text.language.size()));
+	size_t length = text.data.size();
 
-    hb_buffer_add_utf8(buffer, text.c_data(), length, 0, length);
+	hb_buffer_add_utf8(buffer, text.c_data(), length, 0, length);
 
-    // harfbuzz shaping
-    hb_shape(font, buffer, features.empty()
-        ? NULL : &features[0], features.size());
+	// harfbuzz shaping
+	hb_shape(font, buffer, features.empty()
+		? NULL : &features[0], features.size());
 
-    unsigned int glyphCount;
-    hb_glyph_info_t *glyphInfo = hb_buffer_get_glyph_infos(
-        buffer, &glyphCount);
-    hb_glyph_position_t *glyphPos
-        = hb_buffer_get_glyph_positions(buffer, &glyphCount);
+	unsigned int glyphCount;
+	hb_glyph_info_t *glyphInfo = hb_buffer_get_glyph_infos(
+		buffer, &glyphCount);
+	hb_glyph_position_t *glyphPos
+		= hb_buffer_get_glyph_positions(buffer, &glyphCount);
 
-    for (int i = 0; i < glyphCount; ++i) {
-        Glyph* glyph = lib->rasterize(face, glyphInfo[i].codepoint);
+	for (int i = 0; i < glyphCount; ++i) {
+		Glyph* glyph = lib->rasterize(face, glyphInfo[i].codepoint);
 
-        // From the original code...
-        // The other variables are probably no longer needed:
-        float xa = (float) glyphPos[i].x_advance / 64;
-        float ya = (float) glyphPos[i].y_advance / 64;
-        float xo = (float) glyphPos[i].x_offset / 64;
-        float yo = (float) glyphPos[i].y_offset / 64;
-        float x0 = x + xo + glyph->bearing_x;
-        float y0 = floor(y + yo + glyph->bearing_y);
+		// From the original code...
+		// The other variables are probably no longer needed:
+		float xa = (float) glyphPos[i].x_advance / 64;
+		float ya = (float) glyphPos[i].y_advance / 64;
+		float xo = (float) glyphPos[i].x_offset / 64;
+		float yo = (float) glyphPos[i].y_offset / 64;
+		float x0 = x + xo + glyph->bearing_x;
+		float y0 = floor(y + yo + glyph->bearing_y);
 
-        // Figure out the offset into the memory of the bitmap
-        // for x and y:
-        // This probaly needs to be changed to use x0 and y0 instead
-        // of x and y.
-        uint8* pixel = bits + (int32)y0 * bytesPerRow + (int32)x0 * 4;
+		// Figure out the offset into the memory of the bitmap
+		// for x and y:
+		// This probaly needs to be changed to use x0 and y0 instead
+		// of x and y.
+		uint8* pixel = bits + (int32)y0 * bytesPerRow + (int32)x0 * 4;
 
-        // Copy the rasterized glyph into the bitmap buffer
-        for (int iy = 0; iy < glyph->height; ++iy) {
-            uint8* p = pixel;
-            // Offset into the rasterized glyph buffer:
-            uint8* g = glyph->buffer + iy * glyph->width;
+		// Copy the rasterized glyph into the bitmap buffer
+		for (int iy = 0; iy < glyph->height; ++iy) {
+			uint8* p = pixel;
+			// Offset into the rasterized glyph buffer:
+			uint8* g = glyph->buffer + iy * glyph->width;
 
-            // Copy one row of the glyph data while doing a
-            // "color space conversion":
-            for (int ix = 0; iy < glyph->width; ++ix) {
-                p[0] = *g;
-                p[1] = *g;
-                p[2] = *g;
-                p[3] = 255;
+			// Copy one row of the glyph data while doing a
+			// "color space conversion":
+			for (int ix = 0; iy < glyph->width; ++ix) {
+				p[0] = *g;
+				p[1] = *g;
+				p[2] = *g;
+				p[3] = 255;
 
-                p += 4; // four bytes per pixel
-                g += 1; // probably just one byte per pixel
-            }
-            // Next row in the bitmap's buffer:
-            pixel += bytesPerRow;
-        }
+				p += 4; // four bytes per pixel
+				g += 1; // probably just one byte per pixel
+			}
+			// Next row in the bitmap's buffer:
+			pixel += bytesPerRow;
+		}
 
-        // Advance x and y for the next glyph
-        x += xa;
-        y += ya;
+		// Advance x and y for the next glyph
+		x += xa;
+		y += ya;
 
-        lib->freeGlyph(glyph);
-    }
+		lib->freeGlyph(glyph);
+	}
 }
 
 void HBShaper::init() {

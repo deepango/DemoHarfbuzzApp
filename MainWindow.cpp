@@ -7,6 +7,12 @@
 
 #include "MainView.h"
 
+#include <Bitmap.h>
+
+#include "freetypelib.h"
+#include "hbshaper.h"
+
+
 	
 MainWindow::MainWindow(void)
 	:	BWindow(BRect(100,100,500,400),"Font Demo", B_TITLED_WINDOW,
