@@ -7,6 +7,7 @@
 
 #include "MainView.h"
 
+
 	
 MainWindow::MainWindow(void)
 	:	BWindow(BRect(100,100,500,400),"Font Demo", B_TITLED_WINDOW,

@@ -8,6 +8,7 @@ class MainView : public BView
 public:
 					MainView(const BRect &frame);
 		void		Draw(BRect update);
+		void		_DrawText(const BBitmap* bitmap);
 };
 
 #endif
