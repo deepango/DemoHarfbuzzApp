@@ -7,11 +7,6 @@
 
 #include "MainView.h"
 
-#include <Bitmap.h>
-
-#include "freetypelib.h"
-#include "hbshaper.h"
-
 
 	
 MainWindow::MainWindow(void)
