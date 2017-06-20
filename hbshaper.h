@@ -36,10 +36,14 @@ class HBShaper {
     public:
         HBShaper(const string& fontFile, FreeTypeLib* lib);
         ~HBShaper();
-
         void init();
         void drawText(HBText& text, const BBitmap* bitmap, float x, float y);
         void addFeature(hb_feature_t feature);
+        
+
+       // void init();
+        //void drawText(HBText& text, const BBitmap* bitmap, float x, float y);
+       // void addFeature(hb_feature_t feature);
 
     private:
         FreeTypeLib* lib;
@@ -49,6 +53,13 @@ class HBShaper {
         hb_buffer_t* buffer;
         vector<hb_feature_t> features;
 };
+
+void HBShaper::init() {
+    font = hb_ft_font_create(*face, NULL);
+    buffer = hb_buffer_create();
+
+    assert(hb_buffer_allocation_successful(buffer));
+}
 
 HBShaper::HBShaper(const string& fontFile, FreeTypeLib* fontLib) {
     lib = fontLib;
@@ -120,11 +131,16 @@ HBShaper::drawText(HBText& text, const BBitmap* bitmap, float x, float y)
 			// Copy one row of the glyph data while doing a
 			// "color space conversion":
 			for (int ix = 0; iy < glyph->width; ++ix) {
-				p[0] = *g;
-				p[1] = *g;
-				p[2] = *g;
-				p[3] = 255;
-
+				for(int ixyz=0,int iabc=x0;ixyz<glyph->height,iabc<bitmap->IntegerHeight();ixyz++,iabc++) {
+					for(int jxyz=0,int jabc=y0;jxyz<glyph->width,jabc<bitmap->IntegerWidth();jxyz++,jabc++) {
+						if(ixyz==iabc && jxyz==jabc) {
+							p[0] = *g;
+							p[1] = *g;
+							p[2] = *g;
+							p[3] = 255;
+						}
+					}
+				}
 				p += 4; // four bytes per pixel
 				g += 1; // probably just one byte per pixel
 			}
@@ -139,17 +155,17 @@ HBShaper::drawText(HBText& text, const BBitmap* bitmap, float x, float y)
 		lib->freeGlyph(glyph);
 	}
 }
-
+/*
 void HBShaper::init() {
     font = hb_ft_font_create(*face, NULL);
     buffer = hb_buffer_create();
 
     assert(hb_buffer_allocation_successful(buffer));
 }
+*/
 
 HBShaper::~HBShaper() {
     lib->freeFace(face);
-
     hb_buffer_destroy(buffer);
     hb_font_destroy(font);
 }
