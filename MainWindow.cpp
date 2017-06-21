@@ -10,7 +10,7 @@
 
 	
 MainWindow::MainWindow(void)
-	:	BWindow(BRect(100,100,500,400),"Font Demo", B_TITLED_WINDOW,
+	:	BWindow(BRect(100, 100, 900, 550),"Font Demo", B_TITLED_WINDOW,
 					B_ASYNCHRONOUS_CONTROLS)
 {
 	BRect r(Bounds());
