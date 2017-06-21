@@ -63,13 +63,11 @@ void HBShaper::addFeature(hb_feature_t feature) {
 void
 HBShaper::drawText(HBText& text, const BBitmap* bitmap, float x, float y)
 {
+	// Directly copies the rasterized glyph bitmap to the bitmap's buffer
+
 	uint8* bits = (uint8*)bitmap->Bits();
 	uint32 bytesPerRow = bitmap->BytesPerRow();
-
-	// You don't need the GL meshes anymore, you can copy the rasterized
-	// glyph directly into the BBitmap's memory. You may have to do a
-	// color space conversion, i.e. the glyph's data may be gray scale,
-	// but the BBitmap's buffer is BGRA with 8 bits per chanel.
+	BRect bitmapBounds = bitmap->Bounds();
 
 	// Here is the original code from the test app
 	hb_buffer_reset(buffer);
@@ -104,32 +102,66 @@ HBShaper::drawText(HBText& text, const BBitmap* bitmap, float x, float y)
 		float yo = (float) glyphPos[i].y_offset / 64;
 		float x0 = x + xo + glyph->bearing_x;
 		float y0 = floor(y + yo + glyph->bearing_y);
+		// The libfreetype coordinate system is upside down, so flip y0:
+		y0 = bitmapBounds.bottom - y0;
+
+		// Calculate an area for the glyph...
+		BRect glyphArea = BRect(0, 0, (int)glyph->width - 1,
+			(int)glyph->height - 1);
+		// ...move it into the bitmap's coordinate space...
+		glyphArea.OffsetTo(x0, y0);
+		// ... and intersect it with the bitmap's bounds to find
+		// the overlapping area:
+		glyphArea = glyphArea & bitmapBounds;
+		// Test wether the glyphArea is valid. If it is not valid,
+		// there was no overlapping area:
+		if (!glyphArea.IsValid())
+			continue;
 
 		// Figure out the offset into the memory of the bitmap
-		// for x and y:
-		// This probaly needs to be changed to use x0 and y0 instead
-		// of x and y.
-		uint8* pixel = bits + (int32)y0 * bytesPerRow + (int32)x0 * 4;
+		// for the top/left of the glyph area. The bitmap's buffer
+		// has "bytesPerRow" bytes in each vertical row of pixels.
+		// And it has 4 bytes per pixel, one byte per color component
+		// B, G, R, and A (alpha).
+		uint8* bitmapStart = bits + (int32)glyphArea.top * bytesPerRow
+			+ (int32)glyphArea.left * 4;
+
+		// Since the glyphArea is constrained to the bitmap area,
+		// we may not copy all of the glyph's bitmap. Therefor we need
+		// to figure out where in the glyph buffer is the pixel that
+		// corresponds to the (glyphArea.left, glyphArea.top). The
+		// buffer(0, 0) is at (x0, y0), so that is our reference point,
+		// the new offset is relative to that.
+		// The glyph buffer is monochrome, which means it has one byte
+		// per pixel. glyph->width gives the number of bytes per row.
+		uint8* glyphStart = glyph->buffer
+			+ (int32)(glyphArea.top - y0) * glyph->width
+			+ (int32)(glyphArea.left - x0);
 
 		// Copy the rasterized glyph into the bitmap buffer
-		for (int iy = 0; iy < glyph->height; ++iy) {
-			uint8* p = pixel;
-			// Offset into the rasterized glyph buffer:
-			uint8* g = glyph->buffer + iy * glyph->width;
-
+		for (int iy = (int)glyphArea.top; iy <= (int)glyphArea.bottom; ++iy) {
+			// Pixel pointers to the start of the row in each buffer:
+			uint8* b = bitmapStart;
+			uint8* g = glyphStart;
 			// Copy one row of the glyph data while doing a
 			// "color space conversion":
-			for (int ix = 0; iy < glyph->width; ++ix) {
-				p[0] = *g;
-				p[1] = *g;
-				p[2] = *g;
-				p[3] = 255;
+			for (int ix = (int)glyphArea.left; ix <= (int)glyphArea.right; ++ix) {
+				// Do a "saturated add" operation. The same pixel in the bitmap
+				// may be touched by multiple glyphs when rendering text, we
+				// let the glyph values add up:
+				uint8 value = std::min(255, b[0] + *g);
+				b[0] = value;
+				b[1] = value;
+				b[2] = value;
+				b[3] = 255;
 
-				p += 4; // four bytes per pixel
-				g += 1; // probably just one byte per pixel
+				b += 4; // four bytes per pixel
+				g += 1; // just one byte per pixel
 			}
 			// Next row in the bitmap's buffer:
-			pixel += bytesPerRow;
+			bitmapStart += bytesPerRow;
+			// Next row in the glyph's buffer:
+			glyphStart += glyph->width;
 		}
 
 		// Advance x and y for the next glyph
