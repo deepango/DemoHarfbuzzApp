@@ -23,11 +23,11 @@ MainView::_DrawText(const BBitmap* bitmap)
 {
 	
 	FreeTypeLib lib;
-	HBShaper latinShaper("DejaVuSerif.ttf", &lib);
-	HBShaper arabicShaper("amiri-regular.ttf", &lib);
-	HBShaper russianShaper("DejaVuSerif.ttf", &lib);
-	HBShaper hanShaper("fireflysung.ttf", &lib);
-	HBShaper hindiShaper("Sanskrit2003.ttf", &lib);
+	HBShaper latinShaper("fonts/DejaVuSerif.ttf", &lib);
+	HBShaper arabicShaper("fonts/amiri-regular.ttf", &lib);
+	HBShaper russianShaper("fonts/DejaVuSerif.ttf", &lib);
+	HBShaper hanShaper("fonts/fireflysung.ttf", &lib);
+	HBShaper hindiShaper("fonts/Sanskrit2003.ttf", &lib);
 
 	latinShaper.init();
 	arabicShaper.init();
