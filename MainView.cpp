@@ -14,7 +14,7 @@ MainView::Draw(BRect updateRect)
 {
 	BRect bounds = Bounds();
 	BBitmap bitmap(bounds, B_RGBA32);
-	 _DrawText(&bitmap);
+	_DrawText(&bitmap);
 	DrawBitmap(&bitmap, updateRect, updateRect);
 }
 

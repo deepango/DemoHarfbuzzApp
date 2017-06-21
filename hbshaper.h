@@ -36,10 +36,14 @@ class HBShaper {
     public:
         HBShaper(const string& fontFile, FreeTypeLib* lib);
         ~HBShaper();
-
         void init();
         void drawText(HBText& text, const BBitmap* bitmap, float x, float y);
         void addFeature(hb_feature_t feature);
+        
+
+       // void init();
+        //void drawText(HBText& text, const BBitmap* bitmap, float x, float y);
+       // void addFeature(hb_feature_t feature);
 
     private:
         FreeTypeLib* lib;
@@ -49,6 +53,13 @@ class HBShaper {
         hb_buffer_t* buffer;
         vector<hb_feature_t> features;
 };
+
+void HBShaper::init() {
+    font = hb_ft_font_create(*face, NULL);
+    buffer = hb_buffer_create();
+
+    assert(hb_buffer_allocation_successful(buffer));
+}
 
 HBShaper::HBShaper(const string& fontFile, FreeTypeLib* fontLib) {
     lib = fontLib;
@@ -171,17 +182,17 @@ HBShaper::drawText(HBText& text, const BBitmap* bitmap, float x, float y)
 		lib->freeGlyph(glyph);
 	}
 }
-
+/*
 void HBShaper::init() {
     font = hb_ft_font_create(*face, NULL);
     buffer = hb_buffer_create();
 
     assert(hb_buffer_allocation_successful(buffer));
 }
+*/
 
 HBShaper::~HBShaper() {
     lib->freeFace(face);
-
     hb_buffer_destroy(buffer);
     hb_font_destroy(font);
 }
