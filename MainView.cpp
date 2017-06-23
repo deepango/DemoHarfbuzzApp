@@ -50,8 +50,8 @@ MainView::_DrawText(const BBitmap* bitmap)
 	FreeTypeLib lib;
 	HBShaper latinShaper("fonts/DejaVuSerif.ttf", &lib);
 	HBShaper arabicShaper("fonts/amiri-regular.ttf", &lib);
-	HBShaper russianShaper("fonts/DejaVuSerif.ttf", &lib);
-	HBShaper hanShaper("fonts/fireflysung.ttf", &lib);
+	HBShaper russianShaper("fonts/EBGaramond12.ttf", &lib);
+	HBShaper hanShaper("fonts/NotoSansCJKsc.otf", &lib);
 	HBShaper hindiShaper("fonts/Sanskrit2003.ttf", &lib);
 
 	latinShaper.init();
@@ -75,7 +75,7 @@ MainView::_DrawText(const BBitmap* bitmap)
 		};
 		
 		HBText hbt3 = {
-			"Дуо вёжи дёжжэнтиюнт ут",
+			"А́нна де́лится я́блоком с И́горем.",
 			"ru",
 			HB_SCRIPT_CYRILLIC,
 			HB_DIRECTION_LTR
