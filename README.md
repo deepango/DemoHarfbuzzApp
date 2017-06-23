@@ -4,7 +4,7 @@ Harfbuzz Application for Haiku
 Harfbuzz Application for Haiku that renders text using the Harfbuzz Lib and libfreetype.
 This application is made for Haiku as a part of my GSoC 2017 proposal.
 
-![screenshot](screenshot1.png)
+![screenshot](screenshot.png)
 
 How to run on Haiku?
 -------

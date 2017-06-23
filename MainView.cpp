@@ -50,7 +50,7 @@ MainView::_DrawText(const BBitmap* bitmap)
 	FreeTypeLib lib;
 	HBShaper latinShaper("fonts/DejaVuSerif.ttf", &lib);
 	HBShaper arabicShaper("fonts/amiri-regular.ttf", &lib);
-	HBShaper russianShaper("fonts/EBGaramond12.ttf", &lib);
+	HBShaper russianShaper("fonts/DoulosSIL-R.ttf", &lib);
 	HBShaper hanShaper("fonts/NotoSansCJKsc.otf", &lib);
 	HBShaper hindiShaper("fonts/Sanskrit2003.ttf", &lib);
 
