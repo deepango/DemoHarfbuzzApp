@@ -1,3 +1,28 @@
+/* 
+ * The MIT License (MIT)
+ * 
+ * Copyright 2017, Deepanshu Goyal
+ * Copyright 2017, Stephan Aßmus <superstippi@gmx.de>
+ * Copyright 2016, tangrams
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ * 
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ * 
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
 #ifndef HB_SHAPER_H
 #define HB_SHAPER_H
 
@@ -39,9 +64,8 @@ class HBShaper {
     public:
         HBShaper(const char* fontFile, FreeTypeLib* lib);
         ~HBShaper();
-
         void init();
-        void drawText(HBText& text, const BBitmap* bitmap, float x, float y);
+        int drawText(HBText& text, const BBitmap* bitmap, float x, float y);
         void addFeature(hb_feature_t feature);
 
     private:
@@ -56,17 +80,40 @@ class HBShaper {
         vector<hb_feature_t> features;
 };
 
-HBShaper::HBShaper(const char* fontFile, FreeTypeLib* fontLib) {
+
+HBShaper::HBShaper(const char* fontFile, FreeTypeLib* fontLib)
+{
     lib = fontLib;
     float size = 50;
     face = lib->loadFace(fontFile, size * 64, 72, 72);
 }
 
-void HBShaper::addFeature(hb_feature_t feature) {
+
+HBShaper::~HBShaper()
+{
+    lib->freeFace(face);
+    hb_buffer_destroy(buffer);
+    hb_font_destroy(font);
+}
+
+
+void
+HBShaper::init()
+{
+    font = hb_ft_font_create(*face, NULL);
+    buffer = hb_buffer_create();
+
+    assert(hb_buffer_allocation_successful(buffer));
+}
+
+
+void HBShaper::addFeature(hb_feature_t feature)
+{
     features.push_back(feature);
 }
-	
-void
+
+
+int
 HBShaper::drawText(HBText& text, const BBitmap* bitmap, float x, float y)
 {
 	// Directly copies the rasterized glyph bitmap to the bitmap's buffer
@@ -119,9 +166,12 @@ HBShaper::drawText(HBText& text, const BBitmap* bitmap, float x, float y)
 
 		lib->freeGlyph(glyph);
 	}
+	return(0);
 }
 
-void HBShaper::drawGlyph(uint8* bits, int32 bytesPerRow, BRect bitmapBounds,
+
+void
+HBShaper::drawGlyph(uint8* bits, int32 bytesPerRow, BRect bitmapBounds,
 	const Glyph* glyph, float x, float y)
 {
 	// Calculate an area for the glyph...
@@ -182,20 +232,6 @@ void HBShaper::drawGlyph(uint8* bits, int32 bytesPerRow, BRect bitmapBounds,
 		// Next row in the glyph's buffer:
 		glyphStart += glyph->width;
 	}
-}
-
-void HBShaper::init() {
-    font = hb_ft_font_create(*face, NULL);
-    buffer = hb_buffer_create();
-
-    assert(hb_buffer_allocation_successful(buffer));
-}
-
-HBShaper::~HBShaper() {
-    lib->freeFace(face);
-
-    hb_buffer_destroy(buffer);
-    hb_font_destroy(font);
 }
 
 #endif // HB_SHAPER_H
