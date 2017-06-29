@@ -1,3 +1,28 @@
+/* 
+ * The MIT License (MIT)
+ * 
+ * Copyright 2017, Deepanshu Goyal
+ * Copyright 2016, tangrams
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ * 
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ * 
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+ 
 #pragma once
 
 #include "hb.h"
@@ -37,7 +62,7 @@ class HBShaper {
         HBShaper(const string& fontFile, FreeTypeLib* lib);
         ~HBShaper();
         void init();
-        void drawText(HBText& text, const BBitmap* bitmap, float x, float y);
+        int drawText(HBText& text, const BBitmap* bitmap, float x, float y);
         void addFeature(hb_feature_t feature);
         
 
@@ -71,7 +96,7 @@ void HBShaper::addFeature(hb_feature_t feature) {
     features.push_back(feature);
 }
 	
-void
+int
 HBShaper::drawText(HBText& text, const BBitmap* bitmap, float x, float y)
 {
 	// Directly copies the rasterized glyph bitmap to the bitmap's buffer
@@ -126,8 +151,8 @@ HBShaper::drawText(HBText& text, const BBitmap* bitmap, float x, float y)
 		glyphArea = glyphArea & bitmapBounds;
 		// Test wether the glyphArea is valid. If it is not valid,
 		// there was no overlapping area:
-		if (!glyphArea.IsValid())
-			continue;
+		//if (!glyphArea.IsValid())
+		//	return(0);
 
 		// Figure out the offset into the memory of the bitmap
 		// for the top/left of the glyph area. The bitmap's buffer
@@ -181,6 +206,7 @@ HBShaper::drawText(HBText& text, const BBitmap* bitmap, float x, float y)
 
 		lib->freeGlyph(glyph);
 	}
+	return(0);
 }
 /*
 void HBShaper::init() {
