@@ -8,10 +8,10 @@ FreeTypeLib::~FreeTypeLib() {
     FT_Done_FreeType(lib);
 }
 
-FT_Face* FreeTypeLib::loadFace(const string& fontName, int ptSize, int deviceHDPI, int deviceVDPI) {
+FT_Face* FreeTypeLib::loadFace(const char* fontName, int ptSize, int deviceHDPI, int deviceVDPI) {
     FT_Face* face = new FT_Face;
 
-    assert(!FT_New_Face(lib, fontName.c_str(), 0, face));
+    assert(!FT_New_Face(lib, fontName, 0, face));
     assert(!force_ucs2_charmap(*face));
     assert(!FT_Set_Char_Size(*face, 0, ptSize, deviceHDPI, deviceVDPI));
 
@@ -39,7 +39,7 @@ int FreeTypeLib::force_ucs2_charmap(FT_Face ftf) {
     return -1;
 }
 
-Glyph* FreeTypeLib::rasterize(FT_Face* face, uint32_t glyphIndex) const {
+Glyph* FreeTypeLib::rasterize(FT_Face* face, uint32 glyphIndex) const {
     Glyph* g = new Glyph;
 
     FT_Int32 flags =  FT_LOAD_DEFAULT;
